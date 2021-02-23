@@ -12,8 +12,9 @@ sudo apt install build-essential
 #DOCKER
 sudo apt-get update
 sudo apt-get upgrade
+
 curl -fsSL test.docker.com -o get-docker.sh && sh get-docker.sh
-sudo usermod -aG docker ${USERNAME}
+sudo usermod -aG docker ${USER}
 
 #MYSQL 
 sudo apt install mysql-server
@@ -34,8 +35,9 @@ sudo mysql -e "GRANT ALL PRIVILEGES ON ${DB_NAME}.* TO '${DB_USER}'@'localhost';
 ####
 
 
-echo Build-Essential, Docker and MySQL installed
+echo '#################################################'
+echo '#  Build-Essential, Docker and MySQL installed  #'
+echo '#################################################'
 echo 'run: wordpress-website/install/./install-server.sh'
+echo "Point your domain A records to this ip: $(wget -qO- ipinfo.io/ip)"
 sudo su brunocosta
-
-
