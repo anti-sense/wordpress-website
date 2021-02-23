@@ -34,17 +34,8 @@ sudo mysql -e "GRANT ALL PRIVILEGES ON ${DB_NAME}.* TO '${DB_USER}'@'localhost';
 ####
 
 
-#Build website
-cd wordpress-website
+echo Build-Essential, Docker and MySQL installed
+echo 'run: wordpress-website/install/./install-server.sh'
+sudo su brunocosta
 
-#Set website
-docker build -t antisense/website .
-docker run -d --network="host" --mount source=wp-app,target=/var/www/html --restart unless-stopped antisense/website
-#docker logs antisense/website
-#docker exec -it [container] /bin/bash
 
-sudo apt install nginx certbot python3-certbox-nginx
-sudo cp nginx/antisense.conf /etc/nginx/sites-enabled/
-sudo systemctl start nginx
-
-sudo certbot --nginx certonly -d anti-sense.com -d www.anti-sense.com
