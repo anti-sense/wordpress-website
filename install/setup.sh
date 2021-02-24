@@ -38,6 +38,8 @@ sudo mysql -e "GRANT ALL PRIVILEGES ON ${DB_NAME}.* TO '${DB_USER}'@'localhost';
 echo '#################################################'
 echo '#  Build-Essential, Docker and MySQL installed  #'
 echo '#################################################'
-echo 'run: wordpress-website/install/./install-server.sh'
+echo 'Send database and github key'
+echo 'run on desktop: ./remote.sh'
 echo "Point your domain A records to this ip: $(wget -qO- ipinfo.io/ip)"
+echo 'run: wordpress-website/install/./install-server.sh'
 sudo su brunocosta
