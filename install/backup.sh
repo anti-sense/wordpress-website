@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-DB_NAME=wordpress
+DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+. DIR/../.env
 
 
 _now=$(date +"%m_%d_%Y")
@@ -15,3 +16,6 @@ cp /home/${USER}/wordpress-website/$_file /home/${USER}/wordpress-website/latest
 #git add .
 #git commit -m "Weekly backup"
 #git push origin master
+
+
+

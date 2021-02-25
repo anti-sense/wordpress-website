@@ -5,7 +5,6 @@
 #       or 
 # wget https://raw.githubusercontent.com/anti-sense/wordpress-website/master/install.sh
 #############################################################################################
-USERNAME="brunocosta"
 echo -n USERNAME: 
 read USERNAME
 

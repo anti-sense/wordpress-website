@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
-DB_PASSWORD=password
-DB_NAME=wordpress
-DB_USER=wordpress
-
+DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+. DIR/../.env
 
 
 #Build website
@@ -30,3 +28,5 @@ docker run -d --network="host" --mount source=wp-app,target=/var/www/html --rest
 sudo ln -s /var/lib/docker/volumes/wp-app/_data /home/$USER/wordpress-website/backup
 sudo chown -R wwww-data:www-data /home/$USER/wordpress-website/backup/*
 sudo chown -R wwww-data:www-data /home/$USER/wordpress-website/backup/.htaccess
+
+##Setup madreputa
