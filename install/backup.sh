@@ -3,13 +3,13 @@ DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 . $DIR/../.env
 
 
-_now=$(date +"%m_%d_%Y")
-_file="wp-data/data_$_now.sql"
+_now=$(date +"%Y_%m_%d")
+_file="wp-data/data_$_now.sql.gz"
 
-sudo mysqldump "$DB_NAME" > /home/${USER}/wordpress-website/$_file
+sudo mysqldump "$DB_NAME" | gzip > /home/${USER}/wordpress-website/$_file
 
-cp /home/${USER}/wordpress-website/$_file /home/${USER}/wordpress-website/latest.sql
-#scp /home/${USER}/wordpress-website/$_file backup:~/~/data/Backups/computers/antisense/wp-data/
+cp /home/${USER}/wordpress-website/$_file /home/${USER}/wordpress-website/wp-data/latest.sql.gz
+rsync -Pvzb --suffix=.$(date +"%Y_%m_%d") /home/${USER}/wordpress-website/$_file backup:~/data/Backups/computers/antisense/wp-data/
 ##run dated backup copy & compress 
 
 #cd ~/wordpress/backup
