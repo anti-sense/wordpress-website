@@ -12,10 +12,10 @@ cp /home/${USER}/wordpress-website/$_file /home/${USER}/wordpress-website/wp-dat
 rsync -Pvzb --suffix=.$(date +"%Y_%m_%d") /home/${USER}/wordpress-website/$_file backup:~/data/Backups/computers/antisense/wp-data/
 ##run dated backup copy & compress 
 
-#cd ~/wordpress/backup
-#git add .
-#git commit -m "Weekly backup"
-#git push origin master
+cd /home/brunocosta/wordpress/backup
+git add .
+git commit -m "Weekly backup"
+git push origin master
 
 
 
