@@ -1,0 +1,12 @@
+
+#Stop docker
+#add "listen 80;" in nginx sites-enabled
+sudo sytstemctl restart nginx
+sudo certbot --nginx
+#Don't allow redirect
+#remove listen 80M
+docker run -d --network="host" --mount source=wp-app,target=/var/www/html --restart unless-stopped antisense/website
+
+#Not sure what is used in the docker, might have nginx inside.
+#Config seems to user old
+
