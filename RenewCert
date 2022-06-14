@@ -1,11 +1,16 @@
 
 #Stop docker
+containerID=$( docker ps | grep antisense/website | cut -d " " -f 1 )
+docker stop $containerID
 #add "listen 80;" in nginx sites-enabled
-sudo sytstemctl restart nginx
-sudo certbot --nginx
+sudo ln -s /etc/nginx/sites-available/80 /etc/nginx/sites-enabled/80
+sudo systemctl restart nginx
+sudo certbot --nginx  -d anti-sense.com,www.anti-sense.com --no-redirect
 #Don't allow redirect
-#remove listen 80M
-docker run -d --network="host" --mount source=wp-app,target=/var/www/html --restart unless-stopped antisense/website
+#remove listen 80
+sudo unlink /etc/nginx/sites-enabled/80
+docker restart $containerID
+#docker run -d --network="host" --mount source=wp-app,target=/var/www/html --restart unless-stopped antisense/website
 
 #Not sure what is used in the docker, might have nginx inside.
 #Config seems to user old
