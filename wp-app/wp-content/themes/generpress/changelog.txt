@@ -1,0 +1,8 @@
+### *10.10.2018* - 1.0.1
+- Create theme and upload to WordPress
+
+### *07.03.2019* - 1.0.2
+- Update esc_html__() for (ads-widget.php)
+
+### *11.17.2019* - 1.0.8
+- Update style wedget and

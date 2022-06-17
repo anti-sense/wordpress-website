@@ -23,13 +23,13 @@
 define( 'DB_NAME', 'wordpress');
 
 /** MySQL database username */
-define( 'DB_USER', 'root');
+define( 'DB_USER', 'wordpress');
 
 /** MySQL database password */
 define( 'DB_PASSWORD', 'password');
 
 /** MySQL hostname */
-define( 'DB_HOST', 'db');
+define( 'DB_HOST', '127.0.0.1:3306');
 
 /** Database Charset to use in creating database tables. */
 define( 'DB_CHARSET', 'utf8');
@@ -81,8 +81,9 @@ define( 'WP_DEBUG', false );
 
 ///Start edit Bruno Costa 15 Jan 2020
 //define('WP_SITEURL','http://
-define('WP_HOME','http://web.anti-sense.com');
-define('WP_SITEURL','http://web.anti-sense.com');
+define('WP_HOME','https://www.anti-sense.com');
+define('WP_SITEURL','https://www.anti-sense.com');
+//=
 //end edit
 
 
@@ -92,6 +93,10 @@ define('WP_SITEURL','http://web.anti-sense.com');
 if (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https') {
 	$_SERVER['HTTPS'] = 'on';
 }
+if (isset($_SERVER['HTTP_X_FORWARDED_HOST'])) {
+        $_SERVER['HTTP_HOST'] = $_SERVER['HTTP_X_FORWARDED_HOST'];
+}
+
 
 /* That's all, stop editing! Happy publishing. */
 

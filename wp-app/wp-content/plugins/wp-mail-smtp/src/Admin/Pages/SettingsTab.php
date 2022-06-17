@@ -3,6 +3,7 @@
 namespace WPMailSMTP\Admin\Pages;
 
 use WPMailSMTP\Admin\PageAbstract;
+use WPMailSMTP\Admin\SetupWizard;
 use WPMailSMTP\Debug;
 use WPMailSMTP\Options;
 use WPMailSMTP\Providers\Gmail\Auth;
@@ -21,6 +22,7 @@ class SettingsTab extends PageAbstract {
 	 * @since 1.5.0
 	 */
 	public function __construct() {
+		parent::__construct();
 
 		add_action( 'wp_mail_smtp_admin_pages_settings_license_key', array( __CLASS__, 'display_license_key_field_content' ) );
 	}
@@ -49,13 +51,13 @@ class SettingsTab extends PageAbstract {
 	 */
 	public function display() {
 
-		$options = new Options();
+		$options = Options::init();
 		$mailer  = $options->get( 'mail', 'mailer' );
 
-		$disabled_email = in_array( $mailer, [ 'gmail', 'outlook', 'zoho' ], true ) ? 'disabled' : '';
-		$disabled_name  = 'outlook' === $mailer ? 'disabled' : '';
+		$disabled_email = in_array( $mailer, [ 'zoho' ], true ) ? 'disabled' : '';
+		$disabled_name  = in_array( $mailer, [ 'outlook' ], true ) ? 'disabled' : '';
 
-		if ( empty( $mailer ) ) {
+		if ( empty( $mailer ) || ! in_array( $mailer, Options::$mailers, true ) ) {
 			$mailer = 'mail';
 		}
 
@@ -95,6 +97,24 @@ class SettingsTab extends PageAbstract {
 				</div>
 			</div>
 
+			<?php if ( ! is_network_admin() ) : ?>
+				<!-- Setup Wizard button -->
+				<div id="wp-mail-smtp-setting-row-setup-wizard-button" class="wp-mail-smtp-setting-row wp-mail-smtp-setting-row-email wp-mail-smtp-clear">
+					<div class="wp-mail-smtp-setting-label">
+						<label for="wp-mail-smtp-setting-from_email"><?php esc_html_e( 'Setup Wizard', 'wp-mail-smtp' ); ?></label>
+					</div>
+					<div class="wp-mail-smtp-setting-field">
+						<a href="<?php echo esc_url( SetupWizard::get_site_url() ); ?>" class="wp-mail-smtp-btn wp-mail-smtp-btn-md wp-mail-smtp-btn-blueish">
+							<?php esc_html_e( 'Launch Setup Wizard', 'wp-mail-smtp' ); ?>
+						</a>
+
+						<p class="desc">
+							<?php esc_html_e( 'We\'ll guide you through each step needed to get WP Mail SMTP fully set up on your site.', 'wp-mail-smtp' ); ?>
+						</p>
+					</div>
+				</div>
+			<?php endif; ?>
+
 			<!-- From Email -->
 			<div id="wp-mail-smtp-setting-row-from_email" class="wp-mail-smtp-setting-row wp-mail-smtp-setting-row-email wp-mail-smtp-clear">
 				<div class="wp-mail-smtp-setting-label">
@@ -129,7 +149,7 @@ class SettingsTab extends PageAbstract {
 
 						<?php endif; ?>
 
-						<?php if ( empty( $disabled_email ) ) : ?>
+						<?php if ( ! in_array( $mailer, [ 'gmail', 'zoho' ], true ) ) : ?>
 							<p class="desc">
 								<?php esc_html_e( 'The email address that emails are sent from.', 'wp-mail-smtp' ); ?><br/>
 								<?php esc_html_e( 'If you\'re using an email provider (Yahoo, Outlook.com, etc) this should be your email address for that account.', 'wp-mail-smtp' ); ?>
@@ -143,16 +163,10 @@ class SettingsTab extends PageAbstract {
 					<hr class="wp-mail-smtp-setting-mid-row-sep" style="display: <?php echo ( ! empty( $mailer_supported_settings['from_email'] ) && ! empty( $mailer_supported_settings['from_email_force'] ) ) ? 'block' : 'none'; ?>;">
 
 					<div class="js-wp-mail-smtp-setting-from_email_force" style="display: <?php echo empty( $mailer_supported_settings['from_email_force'] ) ? 'none' : 'block'; ?>;">
-						<?php if ( 'gmail' !== $mailer ) : ?>
-							<input name="wp-mail-smtp[mail][from_email_force]" type="checkbox"
-								value="true" <?php checked( true, (bool) $options->get( 'mail', 'from_email_force' ) ); ?>
-								<?php echo $options->is_const_defined( 'mail', 'from_email_force' ) || ! empty( $disabled_email ) ? 'disabled' : ''; ?>
-								id="wp-mail-smtp-setting-from_email_force">
-						<?php else : ?>
-							<input name="wp-mail-smtp[mail][from_email_force]" type="checkbox"
-								value="true" checked="checked" disabled
-								id="wp-mail-smtp-setting-from_email_force">
-						<?php endif; ?>
+						<input name="wp-mail-smtp[mail][from_email_force]" type="checkbox"
+							value="true" <?php checked( true, (bool) $options->get( 'mail', 'from_email_force' ) ); ?>
+							<?php echo $options->is_const_defined( 'mail', 'from_email_force' ) || ! empty( $disabled_email ) ? 'disabled' : ''; ?>
+							id="wp-mail-smtp-setting-from_email_force">
 
 						<label for="wp-mail-smtp-setting-from_email_force">
 							<?php esc_html_e( 'Force From Email', 'wp-mail-smtp' ); ?>
@@ -160,13 +174,7 @@ class SettingsTab extends PageAbstract {
 
 						<?php if ( ! empty( $disabled_email ) ) : ?>
 							<p class="desc">
-								<?php
-								if ( 'gmail' !== $mailer ) :
-									esc_html_e( 'Current provider will automatically force From Email to be the email address that you use to set up the connection below.', 'wp-mail-smtp' );
-								else :
-									esc_html_e( 'Gmail mailer will automatically force From Email to be the email address that you selected above.', 'wp-mail-smtp' );
-								endif;
-								?>
+								<?php esc_html_e( 'Current provider will automatically force From Email to be the email address that you use to set up the connection below.', 'wp-mail-smtp' ); ?>
 							</p>
 						<?php else : ?>
 							<p class="desc">
@@ -310,7 +318,7 @@ class SettingsTab extends PageAbstract {
 								<?php if ( $provider->is_disabled() ) : ?>
 									<?php $provider->display_options(); ?>
 								<?php else : ?>
-									<h2><?php echo $provider->get_title(); ?></h2>
+									<h2><?php echo esc_html( $provider->get_title() ); ?></h2>
 									<?php
 									$provider_edu_notice = $provider->get_notice( 'educational' );
 									$is_dismissed        = (bool) get_user_meta( get_current_user_id(), "wp_mail_smtp_notice_educational_for_{$provider->get_slug()}_dismissed", true );
@@ -324,12 +332,12 @@ class SettingsTab extends PageAbstract {
 												<span class="dashicons dashicons-dismiss"></span>
 											</a>
 
-											<?php echo $provider_edu_notice; ?>
+											<?php echo wp_kses_post( $provider_edu_notice ); ?>
 										</p>
 									<?php endif; ?>
 
 									<?php if ( ! empty( $provider_desc ) ) : ?>
-										<p class="desc"><?php echo $provider_desc; ?></p>
+										<p class="desc"><?php echo wp_kses_post( $provider_desc ); ?></p>
 									<?php endif; ?>
 								<?php endif; ?>
 							</div>
@@ -344,7 +352,7 @@ class SettingsTab extends PageAbstract {
 
 			<?php
 			$settings_content = apply_filters( 'wp_mail_smtp_admin_settings_tab_display', ob_get_clean() );
-			echo $settings_content; // phpcs:ignore
+			echo $settings_content; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			?>
 
 			<?php $this->display_save_btn(); ?>
@@ -390,12 +398,15 @@ class SettingsTab extends PageAbstract {
 
 		<p class="desc">
 			<?php
-			echo wp_kses(
-				__( 'As a valued WP Mail SMTP Lite user you receive <strong>$50 off</strong>, automatically applied at checkout!', 'wp-mail-smtp' ),
-				array(
-					'strong' => array(),
-					'br'     => array(),
-				)
+			printf(
+				wp_kses( /* Translators: %s - discount value $50 */
+					__( 'As a valued WP Mail SMTP Lite user you receive <strong>%s off</strong>, automatically applied at checkout!', 'wp-mail-smtp' ),
+					array(
+						'strong' => array(),
+						'br'     => array(),
+					)
+				),
+				'$50'
 			);
 			?>
 		</p>
@@ -520,14 +531,17 @@ class SettingsTab extends PageAbstract {
 
 			<p>
 				<?php
-				echo wp_kses(
-					__( '<strong>Bonus:</strong> WP Mail SMTP users get <span class="price-off">$50 off regular price</span>, automatically applied at checkout.', 'wp-mail-smtp' ),
-					array(
-						'strong' => array(),
-						'span'   => array(
-							'class' => array(),
-						),
-					)
+				printf(
+					wp_kses( /* Translators: %s - discount value $50. */
+						__( '<strong>Bonus:</strong> WP Mail SMTP users get <span class="price-off">%s off regular price</span>, automatically applied at checkout.', 'wp-mail-smtp' ),
+						array(
+							'strong' => array(),
+							'span'   => array(
+								'class' => array(),
+							),
+						)
+					),
+					'$50'
 				);
 				?>
 			</p>
@@ -540,11 +554,11 @@ class SettingsTab extends PageAbstract {
 	/**
 	 * @inheritdoc
 	 */
-	public function process_post( $data ) {
+	public function process_post( $data ) { // phpcs:ignore Generic.Metrics.CyclomaticComplexity.MaxExceeded
 
 		$this->check_admin_referer();
 
-		$options = new Options();
+		$options = Options::init();
 		$old_opt = $options->get_all();
 
 		// When checkbox is unchecked - it's not submitted at all, so we need to define its default false value.
@@ -576,7 +590,7 @@ class SettingsTab extends PageAbstract {
 
 			// Save correct from email address if Zoho or Outlook mailers are already configured.
 			if (
-				in_array( $data['mail']['mailer'], [ 'zoho', 'outlook' ], true ) &&
+				in_array( $data['mail']['mailer'], [ 'zoho' ], true ) &&
 				! empty( $old_opt[ $data['mail']['mailer'] ]['user_details']['email'] )
 			) {
 				$data['mail']['from_email'] = $old_opt[ $data['mail']['mailer'] ]['user_details']['email'];
@@ -605,13 +619,30 @@ class SettingsTab extends PageAbstract {
 			}
 		}
 
+		// Prevent redirect to setup wizard from settings page after successful auth.
+		if (
+			! empty( $data['mail']['mailer'] ) &&
+			in_array( $data['mail']['mailer'], [ 'gmail', 'outlook', 'zoho' ], true )
+		) {
+			$data[ $data['mail']['mailer'] ]['is_setup_wizard_auth'] = false;
+		}
+
+		/**
+		 * Filters mail settings before save.
+		 *
+		 * @since 2.2.1
+		 *
+		 * @param array $data Settings data.
+		 */
 		$data = apply_filters( 'wp_mail_smtp_settings_tab_process_post', $data );
 
 		// All the sanitization is done in Options class.
 		$options->set( $data, false, false );
 
 		if ( $to_redirect ) {
-			wp_redirect( $_POST['_wp_http_referer'] . '#wp-mail-smtp-setting-row-gmail-authorize' );
+
+			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotValidated, WordPress.Security.NonceVerification.Missing
+			wp_safe_redirect( sanitize_text_field( wp_unslash( $_POST['_wp_http_referer'] ) ) . '#wp-mail-smtp-setting-row-gmail-authorize' );
 			exit;
 		}
 
