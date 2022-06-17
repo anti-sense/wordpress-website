@@ -26,7 +26,8 @@ sudo ln -s /etc/nginx/sites-available/antisense.conf /etc/nginx/sites-enabled/an
 sudo systemctl start nginx
 docker run -d --network="host" --mount source=wp-app,target=/var/www/html --restart unless-stopped antisense/website
 sudo ln -s /var/lib/docker/volumes/wp-app/_data /home/$USER/wordpress-website/backup
-sudo chown -R wwww-data:www-data /home/$USER/wordpress-website/backup/*
-sudo chown -R wwww-data:www-data /home/$USER/wordpress-website/backup/.htaccess
+sudo chown -R www-data:www-data /home/$USER/wordpress-website/wp-app/
+sudo chown -R www-data:www-data /home/$USER/wordpress-website/backup/*
+sudo chown -R www-data:www-data /home/$USER/wordpress-website/backup/.htaccess
 
 ##Setup madreputa
