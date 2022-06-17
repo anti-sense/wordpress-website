@@ -1,3 +1,12 @@
+# Editing container
+
+``` bash 
+docker exec -it [container-id/name] bash
+apt-get update
+apt-get install vim
+```
+
+
 # WPDC - WordPress Docker Compose
 
 Easy WordPress development with Docker and Docker Compose.

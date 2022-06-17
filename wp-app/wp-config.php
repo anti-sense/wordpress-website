@@ -83,7 +83,6 @@ define( 'WP_DEBUG', false );
 //define('WP_SITEURL','http://
 define('WP_HOME','https://www.anti-sense.com');
 define('WP_SITEURL','https://www.anti-sense.com');
-//=
 //end edit
 
 
