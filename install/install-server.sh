@@ -11,7 +11,7 @@ docker build -t antisense/website .
 #docker logs antisense/website
 #docker exec -it [container] /bin/bash
 
-sudo mysql -D ${DB_PASSWORD} < mv /home/$USER/latest.sql
+sudo mysql -D ${DB_PASSWORD} < /home/$USER/latest.sql
 mkdir /home/$USER/wordpress-website/wp-data/
 mv /home/$USER/latest.sql /home/$USER/wordpress-website/wp-data/
 
