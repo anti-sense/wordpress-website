@@ -8,4 +8,3 @@ ENV WORDPRESS_DB_NAME=wordpress
 
 EXPOSE 80:80
 
-copy wp-app /var/www/html
