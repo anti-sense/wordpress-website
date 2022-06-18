@@ -24,7 +24,8 @@ sudo systemctl stop nginx
 sudo unlink /etc/nginx/sites-enabled/default
 sudo ln -s /etc/nginx/sites-available/antisense.conf /etc/nginx/sites-enabled/antisense.conf
 sudo systemctl start nginx
-docker run -d --network="host" --mount source=wp-app,target=/var/www/html --restart unless-stopped antisense/website
+##Mounts the github folder "wp-add" instead of the Dockerfile content
+docker run -d --network="host" --mount type=bind,source=/home/$USER/wordpress-website/wp-app,target=/var/www/html --restart unless-stopped antisense/website
 sudo ln -s /var/lib/docker/volumes/wp-app/_data /home/$USER/wordpress-website/backup
 sudo chown -R www-data:www-data /home/$USER/wordpress-website/wp-app/
 sudo chown -R www-data:www-data /var/lib/docker/volumes/wp-app/_data/wp-includes
