@@ -2,7 +2,7 @@
 # This file is distributed under the same license as the WordPress - 6.0.x - Development - Administration package.
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2022-05-25 03:39:50+0000\n"
+"PO-Revision-Date: 2022-06-09 10:19:51+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -38,9 +38,293 @@ msgstr "Continue"
 msgid "https://make.wordpress.org/core/2022/05/03/wordpress-6-0-field-guide/"
 msgstr "https://make.wordpress.org/core/2022/05/03/wordpress-6-0-field-guide/"
 
+#. translators: %s: WordPress 6.0 Release Notes link.
+#: wp-admin/about.php:313
+msgid "<a href=\"%s\">Read the WordPress 6.0 Release Notes</a> for more information on the included enhancements and issues fixed, installation information, developer notes and resources, release contributors, and the list of file changes in this release."
+msgstr "<a href=\"%s\">Read the WordPress 6.0 Release Notes</a> for more information on the included enhancements and issues fixed, installation information, developer notes and resources, release contributors, and the list of file changes in this release."
+
+#. translators: %s: WordPress 6.0 Field Guide link.
+#: wp-admin/about.php:302
+msgid "Check out the latest version of the <a href=\"%s\">WordPress Field Guide</a>. It is overflowing with detailed developer notes to help you build with WordPress."
+msgstr "Check out the latest version of the <a href=\"%s\">WordPress Field Guide</a>. It is overflowing with detailed developer notes to help you build with WordPress."
+
+#. translators: 1: Learn WordPress workshops link, 2: Learn WordPress social
+#. learning link.
+#: wp-admin/about.php:290
+msgid "Explore <a href=\"%1$s\">learn.wordpress.org/&#8203;workshops</a> for quick how-to videos and lots more on new features in WordPress. Or join a live <a href=\"%2$s\">interactive online learning session</a> on a specific WordPress topic."
+msgstr "Explore <a href=\"%1$s\">learn.wordpress.org/&#8203;workshops</a> for quick how-to videos and lots more on new features in WordPress. Or join a live <a href=\"%2$s\">interactive online learning session</a> on a specific WordPress topic."
+
+#. translators: %s: 6.0 overview video link.
+#: wp-admin/about.php:276
+msgid "See WordPress 6.0 in action! <a href=\"%s\">Watch a brief overview video</a> highlighting some of the major features debuting in WordPress 6.0."
+msgstr "See WordPress 6.0 in action! <a href=\"%s\">Watch a brief overview video</a> highlighting some of the major features debuting in WordPress 6.0."
+
+#. translators: %s: Version number.
+#: wp-admin/about.php:267
+msgid "Learn more about WordPress %s"
+msgstr "Learn more about WordPress %s"
+
+#: wp-admin/about.php:259
+msgid "Exploring WordPress 6.0 video"
+msgstr "Exploring WordPress 6.0 video"
+
+#: wp-admin/about.php:250
+msgid "Use the gap support functionality in the Gallery block to create different looks–from adding spacing between all images, to removing spacing altogether."
+msgstr "Use the gap support functionality in the Gallery block to create different looks–from adding spacing between all images, to removing spacing altogether."
+
+#: wp-admin/about.php:240
+msgid "Switch between stack, row, and group variations to position groups of blocks with more layout flexibility."
+msgstr "Switch between stack, row, and group variations to position groups of blocks with more layout flexibility."
+
+#: wp-admin/about.php:232
+msgid "Control gaps, margins, typography, and more on a collection of blocks, all at once, in the Group block."
+msgstr "Control gaps, margins, typography, and more on a collection of blocks, all at once, in the Group block."
+
+#: wp-admin/about.php:221
+msgid "Transparency levels for your colors allow for even more creative color options."
+msgstr "Transparency levels for your colours allow for even more creative colour options."
+
+#: wp-admin/about.php:205
+msgid "New border controls offer a simpler way to set your border exactly as you like it."
+msgstr "New border controls offer a simpler way to set your border exactly as you like it."
+
+#: wp-admin/about.php:197
+msgid "A new color panel design saves space, but still shows your options at a glance."
+msgstr "A new colour panel design saves space, but still shows your options at a glance."
+
+#: wp-admin/about.php:185
+msgid "Some highlights for 6.0 include:"
+msgstr "Some highlights for 6.0 include:"
+
+#: wp-admin/about.php:184
+msgid "Design tools grow more powerful and intuitive with each release."
+msgstr "Design tools grow more powerful and intuitive with each release."
+
+#: wp-admin/about.php:181
+msgid "Additional Design Tools"
+msgstr "Additional Design Tools"
+
+#: wp-admin/about.php:171
+msgid "Now you can lock your blocks. Choose to disable the option to move a block, remove a block, or both. This simplifies project handover, allowing your clients to unleash their creativity without worrying about accidentally breaking their site in the process."
+msgstr "Now you can lock your blocks. Choose to disable the option to move a block, remove a block, or both. This simplifies project handover, allowing your clients to unleash their creativity without worrying about accidentally breaking their site in the process."
+
+#: wp-admin/about.php:168
+msgid "Block Locking Controls"
+msgstr "Block Locking Controls"
+
+#: wp-admin/about.php:154
+msgid "New keyboard shortcuts enable you to select multiple blocks from the list view, modify them in bulk, and drag-and-drop them within the list. List View can be opened and closed easily; it comes collapsed by default and it automatically expands to the current selection whenever you select a block."
+msgstr "New keyboard shortcuts enable you to select multiple blocks from the list view, modify them in bulk, and drag-and-drop them within the list. List View can be opened and closed easily; it comes collapsed by default and it automatically expands to the current selection whenever you select a block."
+
+#: wp-admin/about.php:151
+msgid "Better List View"
+msgstr "Better List View"
+
+#. translators: %s Working with Patterns dev note link.
+#: wp-admin/about.php:140
+msgid "Patterns will now appear when you need them in even more places, like in the quick inserter or when creating a new header or footer. If you&#8217;re a block theme author, you can even <a href=\"%s\">register patterns from the Pattern Directory using <code>theme.json</code></a>, enabling you to prioritize specific patterns that are most helpful to your theme&#8217;s users."
+msgstr "Patterns will now appear when you need them in even more places, like in the quick inserter or when creating a new header or footer. If you&#8217;re a block theme author, you can even <a href=\"%s\">register patterns from the Pattern Directory using <code>theme.json</code></a>, enabling you to prioritize specific patterns that are most helpful to your theme&#8217;s users."
+
+#: wp-admin/about.php:134
+msgid "Integrated Patterns"
+msgstr "Integrated Patterns"
+
+#: wp-admin/about.php:124
+msgid "The query block supports filtering on multiple authors, support for custom taxonomies, and support for customizing what is shown when there are no results."
+msgstr "The query block supports filtering on multiple authors, support for custom taxonomies, and support for customizing what is shown when there are no results."
+
+#: wp-admin/about.php:118
+msgid "While editing a template, at the root, or between blocks, the quick inserter shows you patterns and template parts to help you work faster and discover new layout options."
+msgstr "While editing a template, at the root, or between blocks, the quick inserter shows you patterns and template parts to help you work faster and discover new layout options."
+
+#: wp-admin/about.php:112
+msgid "New featured image sizing controls make it easier to get the results you want."
+msgstr "New featured image sizing controls make it easier to get the results you want."
+
+#: wp-admin/about.php:111
+msgid "Featured images can be used in the cover block."
+msgstr "Featured images can be used in the cover block."
+
+#: wp-admin/about.php:101
+msgid "WordPress 6.0 includes five new template options: author, date, categories, tag, and taxonomy. These additional templates provide greater flexibility for content creators. Tailor each with the tools you already know or with the following new options in this release."
+msgstr "WordPress 6.0 includes five new template options: author, date, categories, tag, and taxonomy. These additional templates provide greater flexibility for content creators. Tailor each with the tools you already know or with the following new options in this release."
+
+#: wp-admin/about.php:98
+msgid "More Template Choices"
+msgstr "More Template Choices"
+
+#: wp-admin/about.php:84
+msgid "Block themes now include the option to contain multiple style variations. This expands the new Style system even further and enables shortcuts to switch the look and feel of your site all within a single theme. You can change both the available settings, like the font weight, and the style options, like the default color palette. Change the look and feel of your site with just a few clicks."
+msgstr "Block themes now include the option to contain multiple style variations. This expands the new Style system even further and enables shortcuts to switch the look and feel of your site all within a single theme. You can change both the available settings, like the font weight, and the style options, like the default colour palette. Change the look and feel of your site with just a few clicks."
+
+#: wp-admin/about.php:81
+msgid "Style Switching"
+msgstr "Style Switching"
+
+#: wp-admin/about.php:73
+msgid "Make tag clouds and social icons even more appealing with updated settings and controls, and a new outline style for the tag cloud."
+msgstr "Make tag clouds and social icons even more appealing with updated settings and controls, and a new outline style for the tag cloud."
+
+#: wp-admin/about.php:72
+msgid "Create customized buttons and any new buttons you make will retain the style customizations automatically."
+msgstr "Create customized buttons and any new buttons you make will retain the style customizations automatically."
+
+#: wp-admin/about.php:71
+msgid "Keep existing styles when you transform some blocks from one kind to another—from a Paragraph block to a Code block, for instance."
+msgstr "Keep existing styles when you transform some blocks from one kind to another—from a Paragraph block to a Code block, for instance."
+
+#: wp-admin/about.php:70
+msgid "Type two open brackets <code>[[</code> to quickly access the link menu."
+msgstr "Type two open brackets <code>[[</code> to quickly access the link menu."
+
+#: wp-admin/about.php:69
+msgid "Select text across multiple blocks and edit it all at once."
+msgstr "Select text across multiple blocks and edit it all at once."
+
+#: wp-admin/about.php:66
+msgid "Writing improvements abound, whether you&#8217;re writing a brand new post or adding elements to an existing page. Explore more ways to streamline your content creation process, including:"
+msgstr "Writing improvements abound, whether you&#8217;re writing a brand new post or adding elements to an existing page. Explore more ways to streamline your content creation process, including:"
+
+#: wp-admin/about.php:63
+msgid "Enhanced Writing Experience"
+msgstr "Enhanced Writing Experience"
+
+#: wp-admin/about.php:52
+msgid "WordPress 6.0 includes more than 500 enhancements and 400 bug fixes. This page highlights several key advancements aimed at making your WordPress content-creating and site-building experience more feature-rich and intuitive. You will also find resources for developers and anyone wanting a deeper understanding of WordPress."
+msgstr "WordPress 6.0 includes more than 500 enhancements and 400 bug fixes. This page highlights several key advancements aimed at making your WordPress content-creating and site-building experience more feature-rich and intuitive. You will also find resources for developers and anyone wanting a deeper understanding of WordPress."
+
+#: wp-admin/includes/ajax-actions.php:1324
+#: wp-admin/includes/ajax-actions.php:1426
+msgid "Please type your comment text."
+msgstr "Please type your comment text."
+
+#: wp-admin/users.php:405 wp-admin/users.php:437
+msgid "You cannot remove users."
+msgstr "You cannot remove users."
+
+#. translators: 1: URL to my-sites.php, 2: Number of sites the user has.
+#: wp-admin/user-edit.php:759
+msgid "Application passwords grant access to <a href=\"%1$s\">the %2$s site on the network as you have Super Admin rights</a>."
+msgid_plural "Application passwords grant access to <a href=\"%1$s\">all %2$s sites on the network as you have Super Admin rights</a>."
+msgstr[0] "Application passwords grant access to <a href=\"%1$s\">the %2$s site on the network as you have Super Admin rights</a>."
+msgstr[1] "Application passwords grant access to <a href=\"%1$s\">all %2$s sites on the network as you have Super Admin rights</a>."
+
+#: wp-admin/upgrade.php:140
+msgid "WordPress has been updated! Next and final step is to update your database to the newest version."
+msgstr "WordPress has been updated! Next and final step is to update your database to the newest version."
+
+#: wp-admin/themes.php:208
+msgid "<a href=\"https://wordpress.org/support/article/appearance-themes-screen/\">Documentation on Managing Themes</a>"
+msgstr "<a href=\"https://wordpress.org/support/article/appearance-themes-screen/\">Documentation on Managing Themes</a>"
+
+#. translators: %s: wp-config.php
+#: wp-admin/setup-config.php:173
+msgid "This information is being used to create a %s file."
+msgstr "This information is being used to create a %s file."
+
+#: wp-admin/setup-config.php:161
+msgid "Welcome to WordPress. Before getting started, you will need to know the following items."
+msgstr "Welcome to WordPress. Before getting started, you will need to know the following items."
+
+#: wp-admin/options.php:336
+msgid "Settings save failed."
+msgstr "Settings save failed."
+
+#: wp-admin/options-privacy.php:192
+msgid "After your Privacy Policy page is set, you should edit it."
+msgstr "After your Privacy Policy page is set, you should edit it."
+
+#. translators: 1: .htaccess, 2: Documentation URL, 3: Ctrl + A, 4: ⌘ + A
+#: wp-admin/options-permalink.php:429
+msgid "<strong>Error:</strong> Your %1$s file is not <a href=\"%2$s\">writable</a>, so updating it automatically was not possible. These are the mod_rewrite rules you should have in your %1$s file. Click in the field and press %3$s (or %4$s on Mac) to select all."
+msgstr "<strong>Error:</strong> Your %1$s file is not <a href=\"%2$s\">writable</a>, so updating it automatically was not possible. These are the mod_rewrite rules you should have in your %1$s file. Click in the field and press %3$s (or %4$s on Mac) to select all."
+
+#. translators: 1: web.config, 2: Documentation URL, 3: Ctrl + A, 4: ⌘ + A,
+#. 5: Element code.
+#: wp-admin/options-permalink.php:371
+msgid "<strong>Error:</strong> Your %1$s file is not <a href=\"%2$s\">writable</a>, so updating it automatically was not possible. This is the URL rewrite rule you should have in your %1$s file. Click in the field and press %3$s (or %4$s on Mac) to select all. Then insert this rule inside of the %5$s element in %1$s file."
+msgstr "<strong>Error:</strong> Your %1$s file is not <a href=\"%2$s\">writable</a>, so updating it automatically was not possible. This is the URL rewrite rule you should have in your %1$s file. Click in the field and press %3$s (or %4$s on Mac) to select all. Then insert this rule inside of the %5$s element in %1$s file."
+
+#: wp-admin/options-discussion.php:221
+msgid "An avatar is an image that can be associated with a user across multiple websites. In this area, you can choose to display avatars of users who interact with the site."
+msgstr "An avatar is an image that can be associated with a user across multiple websites. In this area, you can choose to display avatars of users who interact with the site."
+
+#: wp-admin/includes/post.php:1510
+msgid "Change Permalink Structure"
+msgstr "Change Permalink Structure"
+
+#. translators: Do not translate USERNAME, ADMIN_URL, EMAIL, SITENAME, SITEURL:
+#. those are placeholders.
+#: wp-admin/includes/misc.php:1427
+msgid ""
+"Howdy ###USERNAME###,\n"
+"\n"
+"Someone with administrator capabilities recently requested to have the\n"
+"administration email address changed on this site:\n"
+"###SITEURL###\n"
+"\n"
+"To confirm this change, please click on the following link:\n"
+"###ADMIN_URL###\n"
+"\n"
+"You can safely ignore and delete this email if you do not want to\n"
+"take this action.\n"
+"\n"
+"This email has been sent to ###EMAIL###\n"
+"\n"
+"Regards,\n"
+"All at ###SITENAME###\n"
+"###SITEURL###"
+msgstr ""
+"Howdy ###USERNAME###,\n"
+"\n"
+"Someone with administrator capabilities recently requested to have the\n"
+"administration email address changed on this site:\n"
+"###SITEURL###\n"
+"\n"
+"To confirm this change, please click on the following link:\n"
+"###ADMIN_URL###\n"
+"\n"
+"You can safely ignore and delete this email if you do not want to\n"
+"take this action.\n"
+"\n"
+"This email has been sent to ###EMAIL###\n"
+"\n"
+"Regards,\n"
+"All at ###SITENAME###\n"
+"###SITEURL###"
+
 #: wp-admin/includes/meta-boxes.php:709
 msgid "https://wordpress.org/support/article/excerpt/"
 msgstr "https://wordpress.org/support/article/excerpt/"
+
+#. translators: Default privacy policy heading.
+#: wp-admin/includes/class-wp-privacy-policy-content.php:594
+msgid "Where your data is sent"
+msgstr "Where your data is sent"
+
+#. translators: %s: Attachment title.
+#: wp-admin/includes/class-wp-media-list-table.php:822
+msgid "Copy &#8220;%s&#8221; URL to clipboard"
+msgstr "Copy &#8220;%s&#8221; URL to clipboard"
+
+#: wp-admin/includes/class-wp-automatic-updater.php:847
+msgid "Some data that describes the error your site encountered has been put together."
+msgstr "Some data that describes the error your site encountered has been put together."
+
+#: wp-admin/includes/class-wp-automatic-updater.php:781
+msgid "An attempt was made, but your site could not be updated automatically."
+msgstr "An attempt was made, but your site could not be updated automatically."
+
+#: wp-admin/includes/class-theme-installer-skin.php:248
+msgctxt "theme"
+msgid "Active"
+msgstr "Active"
+
+#: wp-admin/includes/class-core-upgrader.php:160
+#: wp-admin/includes/class-wp-upgrader.php:165
+#: wp-admin/includes/update-core.php:999
+msgid "The update cannot be installed because some files could not be copied. This is usually due to inconsistent file permissions."
+msgstr "The update cannot be installed because some files could not be copied. This is usually due to inconsistent file permissions."
 
 #: wp-admin/export-personal-data.php:39
 msgid "<strong>Media</strong> &mdash; A list of URLs for media files the user uploads."
@@ -96,6 +380,10 @@ msgstr[1] "This will grant access to <a href=\"%1$s\">all %2$s sites on the netw
 #: wp-admin/includes/dashboard.php:2047
 msgid "Learn about block themes"
 msgstr "Learn about block themes"
+
+#: wp-admin/includes/dashboard.php:2046
+msgid "There is a new kind of WordPress theme, called a block theme, that lets you build the site you&#8217;ve always wanted &#8212; with blocks and styles."
+msgstr "There&#8217;s a new kind of WordPress theme, called a block theme, that lets you build the site you&#8217;ve always wanted &#8212; with blocks and styles."
 
 #: wp-admin/includes/dashboard.php:2045
 msgid "Discover a new way to build your site."
@@ -511,6 +799,10 @@ msgstr "Many plugins may collect or store personal data either in the WordPress 
 #: wp-admin/export-personal-data.php:45
 msgid "If you are not sure, check the plugin documentation or contact the plugin author to see if the plugin collects data and if it supports the Data Exporter tool. This information may be available in the <a href=\"%s\">Privacy Policy Guide</a>."
 msgstr "If you are not sure, check the plugin documentation or contact the plugin author to see if the plugin collects data and if it supports the Data Exporter tool. This information may be available in the <a href=\"%s\">Privacy Policy Guide</a>."
+
+#: wp-admin/export-personal-data.php:38
+msgid "<strong>Comments</strong> &mdash; For user comments, Email Address, IP Address, User Agent (Browser/OS), Date/Time, Comment Content, and Content URL."
+msgstr "<strong>Comments</strong> &mdash; For user comments, Email Address, IP Address, User Agent (Browser/OS), Date/Time, Comment Content, and Content URL."
 
 #: wp-admin/site-health.php:113
 msgid "Site URLs could not be switched to HTTPS."
