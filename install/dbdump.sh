@@ -13,6 +13,6 @@ sudo mysqldump "$DB_NAME" | gzip > /home/${USER}/wordpress-website/$_file
 
 cp /home/${USER}/wordpress-website/$_file /home/${USER}/wordpress-website/wp-data/latest.sql.gz
 
-systemctl start website-backup
+systemctl start website-savebackup
 
 
