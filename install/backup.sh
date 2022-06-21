@@ -15,6 +15,7 @@ rsync -Pvzb /home/${USER}/wordpress-website/wp-data/latest.sql.gz backup:~/data/
 cd /home/brunocosta/wordpress-website
 git add .
 git commit -m "Weekly backup"
+git tag backup$_now
 git push https://${GITHUB_TOKEN}@github.com/anti-sense/wordpress-website.git
 
 
