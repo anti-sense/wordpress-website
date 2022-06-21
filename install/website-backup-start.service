@@ -1,0 +1,10 @@
+[Unit]
+Description=Weekly backup Website start timer
+
+[Service]
+User=root
+Type=oneshot
+ExecStart=systemctl start website-backup.timer
+
+[Install]
+WantedBy=multi-user.target

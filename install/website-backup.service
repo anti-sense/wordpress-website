@@ -1,0 +1,12 @@
+[Unit]
+Description=SSH key agent
+
+[Service]
+Type=simple
+Environment=USER=brunocosta
+# DISPLAY required for ssh-askpass to work
+#Environment=DISPLAY=:0
+ExecStart=/home/brunocosta/wordpress-website/install/dbdump.sh
+
+[Install]
+WantedBy=default.target

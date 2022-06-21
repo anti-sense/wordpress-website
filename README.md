@@ -5,6 +5,15 @@ docker exec -it [container-id/name] bash
 apt-get update
 apt-get install vim
 ```
+#
+Backups 
+
+Get a token to push tagged commits to repo [https://techglimpse.com/git-push-github-token-based-passwordless/]
+
+Token is stored in .env as GITHUB_TOKEN 
+
+systemctl link /home/brunocosta/wordpress-website/install/website-backup.service
+systemctl link /home/brunocosta/wordpress-website/install/website-dbdump.service
 
 
 # WPDC - WordPress Docker Compose

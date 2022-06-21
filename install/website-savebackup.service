@@ -1,0 +1,13 @@
+[Unit]
+Description=Website weekly backup
+
+[Service]
+Type=simple
+Environment=USER=brunocosta
+User=brunocosta
+# DISPLAY required for ssh-askpass to work
+#Environment=DISPLAY=:0
+ExecStart=/home/brunocosta/wordpress-website/install/backup.sh
+
+[Install]
+WantedBy=default.target
