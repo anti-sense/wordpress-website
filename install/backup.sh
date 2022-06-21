@@ -16,8 +16,11 @@ rsync -Pvzb --suffix=.$(date +"%Y_%m_%d") /home/${USER}/wordpress-website/$_file
 ##run dated backup copy & compress 
 
 cd /home/brunocosta/wordpress-website
-git add .
+git add install/backup.sh
 git commit -m "Weekly backup"
+git checkout 
+git push https://${GITHUB_TOKEN}@github.com/anti-sense/wordpress-website.git
+
 git push origin master
 
 
