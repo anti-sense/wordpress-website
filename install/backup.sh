@@ -17,7 +17,10 @@ git add .
 git commit -m "Weekly backup"
 git tag backup$_now
 git push https://${GITHUB_TOKEN}@github.com/anti-sense/wordpress-website.git
-
+#git push https://${GITHUB_TOKEN}@github.com/anti-sense/wordpress-website/git/
+#### Build something to do the push of tags
+# push all tags
+#git push --tags  
 
 
 
