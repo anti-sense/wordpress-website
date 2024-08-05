@@ -2,26 +2,24 @@
 /*
 * Plugin Name: Simple Google reCAPTCHA
 * Description: Simply protect your WordPress against spam comments and brute-force attacks, thanks to Google reCAPTCHA!
-* Version: 3.9
+* Version: 4.0
 * Author: Michal Novák
 * Author URI: https://www.novami.cz
 * License: GPLv3
 * Text Domain: simple-google-recaptcha
 */
 
-use SimpleGoogleRecaptchaEntity as Entity;
-
+namespace NovaMi\WordPress\SimpleGoogleRecaptcha;
 
 if (!defined('ABSPATH')) {
     die('Direct access not allowed!');
 }
 
-include sprintf('%s/entity.php', dirname(__FILE__));
-
 /**
- * Class SimpleGoogleRecaptcha
+ * Class Core
+ * @package NovaMi\WordPress\SimpleGoogleRecaptcha
  */
-class SimpleGoogleRecaptcha
+class Core
 {
     /** @var string */
     const UPDATE = 'update';
@@ -30,21 +28,9 @@ class SimpleGoogleRecaptcha
     const DISABLE = 'disable';
 
     /** @var string */
-    const KEY_SUFIX = '_key';
+    const SGR_ACTION = Entity::PREFIX . 'action';
 
-    /** @var string */
-    const SGR_V2 = 'v2 "I\'m not a robot" Checkbox';
-
-    /** @var string */
-    const SGR_V3 = 'v3';
-
-    /** @var string */
-    const SGR_MAIN = 'sgr_main';
-
-    /** @var string */
-    const SGR_ACTION = 'sgr_action';
-
-    /** @var SimpleGoogleRecaptcha */
+    /** @var Core */
     public static $instance;
 
     /** @var string */
@@ -54,7 +40,7 @@ class SimpleGoogleRecaptcha
     private $options;
 
     /**
-     * SimpleGoogleRecaptcha constructor.
+     * Core constructor.
      */
     private function __construct()
     {
@@ -63,10 +49,12 @@ class SimpleGoogleRecaptcha
     }
 
     /**
-     * @return SimpleGoogleRecaptcha
+     * @return Core
      */
-    public static function getInstance()
+    public static function getInstance(): Core
     {
+        require_once dirname(__FILE__) . '/entity.php';
+
         if (!self::$instance instanceof self) {
             self::$instance = new self();
         }
@@ -78,31 +66,56 @@ class SimpleGoogleRecaptcha
      * @param int $type
      * @return int
      */
-    private function getOptionFilter($type)
+    private function getOptionFilter(int $type): int
     {
         return $type === Entity::INT ? FILTER_SANITIZE_NUMBER_INT : FILTER_SANITIZE_FULL_SPECIAL_CHARS;
-    }
-
-    /**
-     * @return void
-     */
-    private function loadSettings()
-    {
-        foreach ($this->options as $id => $option) {
-            $type = $option->getType();
-            $filter = $this->getOptionFilter($type);
-            $filteredValue = filter_var(get_option($id), $filter);
-            $option->setValue($type === Entity::INT ? intval($filteredValue) : strval($filteredValue));
-        }
     }
 
     /**
      * @param string $id
      * @return int|string
      */
-    private function getOptionValue($id)
+    private function getOptionValue(string $id)
     {
-        return $this->options[$id]->getValue();
+        return $this->options[$id]->getValue() ?? '';
+    }
+
+    /**
+     * @param string $ext
+     * @param string $name
+     * @return void
+     */
+    private function enqueue(string $ext = 'js', string $name = 'sgr')
+    {
+        $fileName = $name . '.' . $ext;
+        $dirPath = plugin_dir_path(__FILE__) . $fileName;
+        $dirUrl = plugin_dir_url(__FILE__) . $fileName;
+
+        if ($ext === 'js') {
+            wp_enqueue_script($name, $dirUrl, [], filemtime($dirPath));
+            wp_localize_script($name, $name, [Entity::SITE_KEY => $this->getOptionValue(Entity::SITE_KEY)]);
+        } else {
+            wp_enqueue_style($name, $dirUrl, [], filemtime($dirPath));
+        }
+    }
+
+    /**
+     * @param array $atts
+     * @return void
+     */
+    public function displayInput(array $atts)
+    {
+        $key = $atts['key'];
+        $type = $atts['type'];
+        $val = $this->getOptionValue($key);
+
+        if ($type === Entity::INT) {
+            $defaultVal = $key === Entity::VERSION ? 3 : 1;
+
+            echo sprintf('<input type="checkbox" name="%1$s" id="%1$s" value="%2$d" %3$s />', $key, $defaultVal, checked($defaultVal, $val, false));
+        } else {
+            echo sprintf('<input type="text" name="%1$s" class="regular-text" id="%1$s" value="%2$s" />', $key, $val);
+        }
     }
 
     /**
@@ -115,18 +128,28 @@ class SimpleGoogleRecaptcha
         $this->options = [
             Entity::SITE_KEY => new Entity(__('Site Key', 'simple-google-recaptcha'), Entity::STRING),
             Entity::SECRET_KEY => new Entity(__('Secret Key', 'simple-google-recaptcha'), Entity::STRING),
-            Entity::LOGIN_DISABLE => new Entity(__('Disable on login form', 'simple-google-recaptcha'), Entity::INT),
-            Entity::VERSION => new Entity(__('Enable reCAPTCHA v3', 'simple-google-recaptcha'), Entity::INT),
-            Entity::BADGE_HIDE => new Entity(__('Hide reCAPTCHA v3 badge', 'simple-google-recaptcha'), Entity::INT),
+            Entity::LOGIN_DISABLE => new Entity(__('Disable on login form', 'simple-google-recaptcha')),
+            Entity::VERSION => new Entity(__('Enable reCAPTCHA v3', 'simple-google-recaptcha')),
+            Entity::BADGE_HIDE => new Entity(__('Hide reCAPTCHA v3 badge', 'simple-google-recaptcha')),
         ];
 
         $this->updateSettings();
 
-        $this->loadSettings();
+        /**
+         * @var string $id
+         * @var Entity $option
+         */
+        foreach ($this->options as $id => $option) {
+            $type = $option->getType();
+            $filter = $this->getOptionFilter($type);
+            $filteredValue = filter_var(get_option($id), $filter);
+            $option->setValue($type === Entity::INT ? intval($filteredValue) : strval($filteredValue));
+        }
 
         $this->disableProtection();
 
-        $this->enqueueMain();
+        $this->enqueue();
+        $this->enqueue('css');
 
         $this->frontend();
 
@@ -144,13 +167,14 @@ class SimpleGoogleRecaptcha
 
         if ($postAction === self::UPDATE && current_user_can('manage_options')) {
             $hash = null;
+
             foreach ($this->options as $key => $option) {
                 $postValue = filter_input(INPUT_POST, $key, $this->getOptionFilter($option->getType()));
 
                 if ($postValue) {
                     update_option($key, $postValue);
 
-                    if (substr($key, -strlen(self::KEY_SUFIX)) === self::KEY_SUFIX) {
+                    if (substr($key, -strlen('_key')) === '_key') {
                         $hash .= $postValue;
                     }
                 } else {
@@ -165,22 +189,24 @@ class SimpleGoogleRecaptcha
     }
 
     /**
-     * @param $links
+     * @param array $links
      * @return array
      */
-    public function actionLinks($links)
+    public function actionLinks(array $links): array
     {
         return array_merge(['settings' => sprintf('<a href="options-general.php%s">%s</a>', Entity::PAGE_QUERY, __('Settings', 'simple-google-recaptcha'))], $links);
     }
 
     /**
-     * @param $plugin
+     * @param string $plugin
      * @return void
      */
-    public function activation($plugin)
+    public function activation(string $plugin)
     {
         if ($plugin === plugin_basename(__FILE__) && (!get_option(Entity::SITE_KEY) || !get_option(Entity::SECRET_KEY))) {
-            exit(wp_redirect(admin_url(sprintf('options-general.php%s', Entity::PAGE_QUERY))));
+            $adminUrl = admin_url('options-general.php' . Entity::PAGE_QUERY);
+
+            exit(wp_redirect($adminUrl));
         }
     }
 
@@ -191,8 +217,8 @@ class SimpleGoogleRecaptcha
     {
         echo sprintf('<div class="wrap"><h1>%s - %s</h1><form method="post" action="%s">', $this->pluginName, __('Settings', 'simple-google-recaptcha'), Entity::PAGE_QUERY);
 
-        settings_fields('sgr_header_section');
-        do_settings_sections('sgr_options');
+        settings_fields(Entity::PREFIX . 'header_section');
+        do_settings_sections(Entity::PREFIX . 'options');
 
         echo sprintf('<input type="hidden" name="%s" value="%s">', self::SGR_ACTION, self::UPDATE);
 
@@ -206,48 +232,8 @@ class SimpleGoogleRecaptcha
      */
     public function adminMenu()
     {
-        add_submenu_page('options-general.php', $this->pluginName, 'Google reCAPTCHA', 'manage_options', 'sgr_options', [$this, 'optionsPage']);
+        add_submenu_page('options-general.php', $this->pluginName, 'Google reCAPTCHA', 'manage_options', Entity::PREFIX . 'options', [$this, 'optionsPage']);
         add_action('admin_init', [$this, 'displayOptions']);
-    }
-
-    /**
-     * @return void
-     */
-    public function display_sgr_site_key()
-    {
-        echo sprintf('<input type="text" name="%1$s" class="regular-text" id="%1$s" value="%2$s" />', Entity::SITE_KEY, $this->getOptionValue(Entity::SITE_KEY));
-    }
-
-    /**
-     * @return void
-     */
-    public function display_sgr_secret_key()
-    {
-        echo sprintf('<input type="text" name="%1$s" class="regular-text" id="%1$s" value="%2$s" />', Entity::SECRET_KEY, $this->getOptionValue(Entity::SECRET_KEY));
-    }
-
-    /**
-     * @return void
-     */
-    public function display_sgr_login_disable()
-    {
-        echo sprintf('<input type="checkbox" name="%1$s" id="%1$s" value="1" %2$s />', Entity::LOGIN_DISABLE, checked(1, $this->getOptionValue(Entity::LOGIN_DISABLE), false));
-    }
-
-    /**
-     * @return void
-     */
-    public function display_sgr_version()
-    {
-        echo sprintf('<input type="checkbox" name="%1$s" id="%1$s" value="3" %2$s />', Entity::VERSION, checked(3, $this->getOptionValue(Entity::VERSION), false));
-    }
-
-    /**
-     * @return void
-     */
-    public function display_sgr_badge_hide()
-    {
-        echo sprintf('<input type="checkbox" name="%1$s" id="%1$s" value="1" %2$s />', Entity::BADGE_HIDE, checked(1, $this->getOptionValue(Entity::BADGE_HIDE), false));
     }
 
     /**
@@ -255,28 +241,13 @@ class SimpleGoogleRecaptcha
      */
     public function displayOptions()
     {
-        add_settings_section('sgr_header_section', __('Google reCAPTCHA keys', 'simple-google-recaptcha'), [], 'sgr_options');
+        add_settings_section(Entity::PREFIX . 'header_section', __('Google reCAPTCHA keys', 'simple-google-recaptcha'), [], Entity::PREFIX . 'options');
 
         foreach ($this->options as $key => $option) {
-            add_settings_field($key, $option->getName(), [$this, sprintf('display_%s', $key)], 'sgr_options', 'sgr_header_section');
-            register_setting('sgr_header_section', $key);
+            $args = ['key' => $key, 'type' => $option->getType()];
+            add_settings_field($key, $option->getName(), [$this, 'displayInput'], Entity::PREFIX . 'options', Entity::PREFIX . 'header_section', $args);
+            register_setting(Entity::PREFIX . 'header_section', $key);
         }
-    }
-
-    /**
-     * @return void
-     */
-    public function enqueueMain()
-    {
-        $jsName = 'sgr.js';
-        $jsPath = sprintf('%s%s', plugin_dir_path(__FILE__), $jsName);
-        wp_enqueue_script(self::SGR_MAIN, sprintf('%s%s', plugin_dir_url(__FILE__), $jsName), [], filemtime($jsPath));
-
-        wp_localize_script(self::SGR_MAIN, self::SGR_MAIN, [Entity::SITE_KEY => $this->getOptionValue(Entity::SITE_KEY)]);
-
-        $cssName = 'sgr.css';
-        $cssPath = sprintf('%s%s', plugin_dir_path(__FILE__), $cssName);
-        wp_enqueue_style(self::SGR_MAIN, sprintf('%s%s', plugin_dir_url(__FILE__), $cssName), [], filemtime($cssPath));
     }
 
     /**
@@ -291,7 +262,50 @@ class SimpleGoogleRecaptcha
             $jsUrl = sprintf('%s&render=%s&onload=sgr_3', $apiUrlBase, $this->getOptionValue(Entity::SITE_KEY));
         }
 
-        wp_enqueue_script('sgr_recaptcha', $jsUrl, [], time());
+        wp_enqueue_script(Entity::PREFIX . 'recaptcha', $jsUrl, [], time());
+    }
+
+    /**
+     * @param array|null $list
+     * @return array|string[]
+     */
+    public function renderList(?array $list = []): array
+    {
+        $list ?: $list = [
+            'bp_after_signup_profile_fields',
+            'comment_form_after_fields',
+            'lostpassword_form',
+            'register_form',
+            'woocommerce_lostpassword_form',
+            'woocommerce_register_form'
+        ];
+
+        if (!$this->getOptionValue(Entity::LOGIN_DISABLE)) {
+            array_push($list, 'login_form', 'woocommerce_login_form');
+        }
+
+        return $list;
+    }
+
+    /**
+     * @param array|null $list
+     * @return array|string[]
+     */
+    public function verifyList(?array $list = []): array
+    {
+        $list ?: $list = [
+            'bp_signup_validate',
+            'lostpassword_post',
+            'preprocess_comment',
+            'registration_errors',
+            'woocommerce_register_post'
+        ];
+
+        if (!$this->getOptionValue(Entity::LOGIN_DISABLE)) {
+            $list[] = 'authenticate';
+        }
+
+        return $list;
     }
 
     /**
@@ -304,79 +318,51 @@ class SimpleGoogleRecaptcha
         $recaptchaSecretKey = $this->getOptionValue(Entity::SECRET_KEY);
 
         if ($rcpActivate && $recaptchaSiteKey && $recaptchaSecretKey) {
-            $sgr_display_list = [
-                'bp_after_signup_profile_fields',
-                'comment_form_after_fields',
-                'lostpassword_form',
-                'register_form',
-                'woocommerce_lostpassword_form',
-                'woocommerce_register_form'
-            ];
+            add_action(Entity::PREFIX . 'display_list', [$this, 'renderList']);
+            add_action(Entity::PREFIX . 'verify_list', [$this, 'verifyList']);
 
-            $sgr_verify_list = [
-                'bp_signup_validate',
-                'lostpassword_post',
-                'preprocess_comment',
-                'registration_errors',
-                'woocommerce_register_post'
-            ];
-
-            if (!$this->getOptionValue(Entity::LOGIN_DISABLE)) {
-                array_push($sgr_display_list, 'login_form', 'woocommerce_login_form');
-                $sgr_verify_list[] = 'authenticate';
+            foreach (apply_filters(Entity::PREFIX . 'render_list', self::renderList()) as $display) {
+                add_action($display, [$this, 'enqueueScripts']);
+                add_action($display, [$this, 'render']);
             }
 
-            $sgrDisplay = $this->getOptionValue(Entity::VERSION) === 3 ? 'v3Display' : 'v2Display';
-
-            foreach ($sgr_display_list as $sgr_display) {
-                add_action($sgr_display, [$this, 'enqueueScripts']);
-                add_action($sgr_display, [$this, $sgrDisplay]);
-            }
-
-            foreach ($sgr_verify_list as $sgr_verify) {
-                add_action($sgr_verify, [$this, 'verify']);
+            foreach (apply_filters(Entity::PREFIX . 'verify_list', self::verifyList()) as $verify) {
+                add_action($verify, [$this, 'verify']);
             }
         }
     }
 
     /**
-     * @return void
+     * @return bool
      */
-    public function v2Display()
-    {
-        $this->displayDisableProtection();
-
-        echo '<div class="sgr-main"></div>';
-    }
-
-    /**
-     * @return void
-     */
-    public function v3Display()
-    {
-        $badgeText = null;
-
-        if ($this->getOptionValue(Entity::BADGE_HIDE)) {
-            $cssName = 'sgr_hide.css';
-            $cssPath = sprintf('%s%s', plugin_dir_path(__FILE__), $cssName);
-            wp_enqueue_style('sgr_hide', sprintf('%s%s', plugin_dir_url(__FILE__), $cssName), [], filemtime($cssPath));
-
-            $badgeText = sprintf('%s<p class="sgr-infotext">%s</p>', PHP_EOL, __('This site is protected by reCAPTCHA and the Google <a href="https://policies.google.com/privacy">Privacy Policy</a> and <a href="https://policies.google.com/terms">Terms of Service</a> apply.', 'simple-google-recaptcha'));
-        }
-
-        $this->displayDisableProtection();
-
-        echo sprintf('<input type="hidden" name="g-recaptcha-response" class="sgr-main">%s', $badgeText);
-    }
-
-    /**
-     * @return void
-     */
-    private function displayDisableProtection()
+    public function render(): bool
     {
         if ($this->adminCookieHash()) {
-            echo sprintf('<p class="sgr-infotext"><a href="?%s=%s">%s</a></p>', self::SGR_ACTION, self::DISABLE, __('Emergency reCAPTCHA deactivate', 'simple-google-recaptcha'));
+            $linkText = __('Emergency reCAPTCHA deactivate', 'simple-google-recaptcha');
+
+            echo sprintf('<p class="sgr-infotext"><a href="?%s=%s">%s</a></p>', self::SGR_ACTION, self::DISABLE, $linkText);
         }
+
+        echo $this->getOptionValue(Entity::VERSION) === 3 ? self::v3Render() : '<div class="sgr-main"></div>';
+
+        return true;
+    }
+
+    /**
+     * @return string
+     */
+    private function v3Render(): string
+    {
+        $badgeReplacement = null;
+
+        if ($this->getOptionValue(Entity::BADGE_HIDE)) {
+            $this->enqueue('css', Entity::PREFIX . 'hide');
+
+            $msg = __('This site is protected by reCAPTCHA and the Google <a href="https://policies.google.com/privacy">Privacy Policy</a> and <a href="https://policies.google.com/terms">Terms of Service</a> apply.', 'simple-google-recaptcha');
+            $badgeReplacement = sprintf('%s<p class="sgr-infotext">%s</p>', PHP_EOL, $msg);
+        }
+
+        return sprintf('<input type="hidden" name="g-recaptcha-response" class="sgr-main">%s', $badgeReplacement);
     }
 
     /**
@@ -394,16 +380,17 @@ class SimpleGoogleRecaptcha
 
             foreach ($keys as $key) {
                 delete_option($key);
+
                 $this->options[$key]->setValue('');
             }
         }
     }
 
     /**
-     * @param $error_code
-     * @return string|void
+     * @param string|null $error_code
+     * @return string
      */
-    private function errorMessage($error_code)
+    private function errorMessage(?string $error_code): string
     {
         switch ($error_code) {
             case 'missing-input-secret':
@@ -424,10 +411,10 @@ class SimpleGoogleRecaptcha
     }
 
     /**
-     * @param $response
+     * @param string $response
      * @return array|mixed
      */
-    private function recaptchaResponseParse($response)
+    private function recaptchaResponseParse(string $response)
     {
         $secretKey = $this->getOptionValue(Entity::SECRET_KEY);
         $rcpUrl = sprintf('https://www.recaptcha.net/recaptcha/api/siteverify?secret=%s&response=%s', $secretKey, $response);
@@ -439,6 +426,19 @@ class SimpleGoogleRecaptcha
         ];
 
         return isset($response['body']) ? json_decode($response['body'], 1) : $falseResponse;
+    }
+
+    /**
+     * @param string $msg
+     * @return void
+     */
+    private function wpDie(string $msg)
+    {
+        $error = __('Error', 'simple-google-recaptcha');
+        $verificationFailed = __('verification failed', 'simple-google-recaptcha');
+        $errorParams = ['response' => 403, 'back_link' => 1];
+
+        wp_die(sprintf('<p><strong>%s:</strong> Google reCAPTCHA %s. %s</p>', $error, $verificationFailed, $msg), 'Forbidden by reCAPTCHA', $errorParams);
     }
 
     /**
@@ -454,18 +454,11 @@ class SimpleGoogleRecaptcha
             if (isset($parsedResponse['success']) && $parsedResponse['success'] === true) {
                 return $input;
             } else {
-                $errorTitle = 'reCAPTCHA';
-                $errorParams = ['response' => 403, 'back_link' => 1];
-                $failedMsg = '<p><strong>%s:</strong> Google reCAPTCHA %s. %s</p>';
-                $error = __('Error', 'simple-google-recaptcha');
-                $verificationFailed = __('verification failed', 'simple-google-recaptcha');
-
                 if (!$response) {
-                    wp_die(sprintf($failedMsg, $error, $verificationFailed, __('Do you have JavaScript enabled?', 'simple-google-recaptcha')), $errorTitle, $errorParams);
+                    $this->wpDie(__('Do you have JavaScript enabled?', 'simple-google-recaptcha'));
                 }
 
-                $recaptcha_error_code = isset($parsedResponse['error-codes'][0]) ? $parsedResponse['error-codes'][0] : null;
-                wp_die(sprintf($failedMsg, $error, $verificationFailed, $this->errorMessage($recaptcha_error_code)), $errorTitle, $errorParams);
+                $this->wpDie($this->errorMessage($parsedResponse['error-codes'][0] ?? null));
             }
         }
     }
@@ -473,7 +466,7 @@ class SimpleGoogleRecaptcha
     /**
      * @return string
      */
-    public function messageProtectionStatus()
+    public function messageProtectionStatus(): string
     {
         $class = 'warning';
         $name = __('Notice', 'simple-google-recaptcha');
@@ -487,7 +480,7 @@ class SimpleGoogleRecaptcha
             $msg = __('You have to <a href="https://www.google.com/recaptcha/admin" rel="external">register your domain</a>, get required Google reCAPTCHA keys %s and save them bellow.', 'simple-google-recaptcha');
         }
 
-        $type = $this->getOptionValue(Entity::VERSION) === 3 ? self::SGR_V3 : self::SGR_V2;
+        $type = $this->getOptionValue(Entity::VERSION) === 3 ? 'v3' : 'v2 "I\'m not a robot" Checkbox';
 
         return sprintf('<div class="notice notice-%s"><p><strong>%s:</strong> Google reCAPTCHA %s!</p><p>%s</p></div>', $class, $name, $status, sprintf($msg, $type));
     }
@@ -495,16 +488,12 @@ class SimpleGoogleRecaptcha
     /**
      * @return bool
      */
-    public function adminCookieHash()
+    public function adminCookieHash(): bool
     {
         $cookieHash = filter_input(INPUT_COOKIE, Entity::HASH, FILTER_SANITIZE_SPECIAL_CHARS);
 
-        if ($cookieHash === md5($this->getOptionValue(Entity::SITE_KEY) . $this->getOptionValue(Entity::SECRET_KEY))) {
-            return true;
-        } else {
-            return false;
-        }
+        return $cookieHash === md5($this->getOptionValue(Entity::SITE_KEY) . $this->getOptionValue(Entity::SECRET_KEY));
     }
 }
 
-SimpleGoogleRecaptcha::getInstance();
+Core::getInstance();

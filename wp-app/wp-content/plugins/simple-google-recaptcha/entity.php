@@ -1,17 +1,20 @@
 <?php
 
-use SimpleGoogleRecaptchaEntity as Entity;
-
+namespace NovaMi\WordPress\SimpleGoogleRecaptcha;
 
 if (!defined('ABSPATH')) {
-    die();
+    die('Direct access not allowed');
 }
 
 /**
- * Class SimpleGoogleRecaptchaEntity
+ * Class Entity
+ * @package NovaMi\WordPress\SimpleGoogleRecaptcha
  */
-class SimpleGoogleRecaptchaEntity
+class Entity
 {
+    /** @var string */
+    const PREFIX = 'sgr_';
+
     /** @var int */
     const INT = 1;
 
@@ -19,25 +22,25 @@ class SimpleGoogleRecaptchaEntity
     const STRING = 2;
 
     /** @var string */
-    const PAGE_QUERY = '?page=sgr_options';
+    const PAGE_QUERY = '?page=' . self::PREFIX . 'options';
 
     /** @var string */
-    const VERSION = 'sgr_version';
+    const VERSION = self::PREFIX . 'version';
 
     /** @var string */
-    const LOGIN_DISABLE = 'sgr_login_disable';
+    const LOGIN_DISABLE = self::PREFIX . 'login_disable';
 
     /** @var string */
-    const BADGE_HIDE = 'sgr_badge_hide';
+    const BADGE_HIDE = self::PREFIX . 'badge_hide';
 
     /** @var string */
-    const SITE_KEY = 'sgr_site_key';
+    const SITE_KEY = self::PREFIX . 'site_key';
 
     /** @var string */
-    const SECRET_KEY = 'sgr_secret_key';
+    const SECRET_KEY = self::PREFIX . 'secret_key';
 
     /** @var string */
-    const HASH = 'sgr_hash';
+    const HASH = self::PREFIX . 'hash';
 
     /** @var string */
     private $name;
@@ -46,54 +49,32 @@ class SimpleGoogleRecaptchaEntity
     private $type;
 
     /** @var string|int */
-    private $value;
+    private $value = '';
 
     /**
      * @param string $name
      * @param int $type
-     * @param string|int $value
      */
-    public function __construct($name, $type, $value = '')
+    public function __construct(string $name, int $type = self::INT)
     {
         $this->name = $name;
         $this->type = $type;
-        $this->value = $value;
     }
 
     /**
      * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
 
     /**
-     * @param string $name
-     * @return Entity
-     */
-    public function setName($name)
-    {
-        $this->name = $name;
-        return $this;
-    }
-
-    /**
      * @return int
      */
-    public function getType()
+    public function getType(): int
     {
         return $this->type;
-    }
-
-    /**
-     * @param int $type
-     * @return Entity
-     */
-    public function setType($type)
-    {
-        $this->type = $type;
-        return $this;
     }
 
     /**
@@ -105,12 +86,11 @@ class SimpleGoogleRecaptchaEntity
     }
 
     /**
-     * @param int|string $value
-     * @return Entity
+     * @param $value
+     * @return void
      */
     public function setValue($value)
     {
         $this->value = $value;
-        return $this;
     }
 }

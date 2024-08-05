@@ -28,13 +28,18 @@ use Google\Site_Kit\Core\Modules\Module_With_Scopes_Trait;
 use Google\Site_Kit\Core\Modules\Module_With_Service_Entity;
 use Google\Site_Kit\Core\Modules\Module_With_Settings;
 use Google\Site_Kit\Core\Modules\Module_With_Settings_Trait;
+use Google\Site_Kit\Core\Modules\Module_With_Tag;
+use Google\Site_Kit\Core\Modules\Module_With_Tag_Trait;
+use Google\Site_Kit\Core\Modules\Tag_Manager\Tag_Matchers;
+use Google\Site_Kit\Core\Modules\Tags\Module_Tag_Matchers;
 use Google\Site_Kit\Core\REST_API\Data_Request;
 use Google\Site_Kit\Core\REST_API\Exception\Invalid_Datapoint_Exception;
 use Google\Site_Kit\Core\Tags\Guards\Tag_Environment_Type_Guard;
 use Google\Site_Kit\Core\Tags\Guards\Tag_Verify_Guard;
-use Google\Site_Kit\Core\Util\BC_Functions;
-use Google\Site_Kit\Core\Util\Debug_Data;
+use Google\Site_Kit\Core\Site_Health\Debug_Data;
 use Google\Site_Kit\Core\Util\Method_Proxy_Trait;
+use Google\Site_Kit\Core\Util\Sort;
+use Google\Site_Kit\Core\Util\URL;
 use Google\Site_Kit\Modules\Tag_Manager\AMP_Tag;
 use Google\Site_Kit\Modules\Tag_Manager\Settings;
 use Google\Site_Kit\Modules\Tag_Manager\Tag_Guard;
@@ -51,13 +56,13 @@ use WP_Error;
  * @access private
  * @ignore
  */
-final class Tag_Manager extends Module
-	implements Module_With_Scopes, Module_With_Settings, Module_With_Assets, Module_With_Debug_Fields, Module_With_Owner, Module_With_Service_Entity, Module_With_Deactivation {
+final class Tag_Manager extends Module implements Module_With_Scopes, Module_With_Settings, Module_With_Assets, Module_With_Debug_Fields, Module_With_Owner, Module_With_Service_Entity, Module_With_Deactivation, Module_With_Tag {
 	use Method_Proxy_Trait;
 	use Module_With_Assets_Trait;
 	use Module_With_Owner_Trait;
 	use Module_With_Scopes_Trait;
 	use Module_With_Settings_Trait;
+	use Module_With_Tag_Trait;
 
 	/**
 	 * Module slug name.
@@ -93,12 +98,7 @@ final class Tag_Manager extends Module
 		$this->register_scopes_hook();
 
 		// Tag Manager tag placement logic.
-		add_action( 'template_redirect', $this->get_method_proxy( 'register_tag' ) );
-		// Filter the Analytics `canUseSnippet` value.
-		add_filter( 'googlesitekit_analytics_can_use_snippet', $this->get_method_proxy( 'can_analytics_use_snippet' ), 10, 2 );
-		// Filter whether certain users can be excluded from tracking.
-		add_action( 'googlesitekit_allow_tracking_disabled', $this->get_method_proxy( 'filter_analytics_allow_tracking_disabled' ) );
-		add_action( 'googlesitekit_analytics_tracking_opt_out', $this->get_method_proxy( 'analytics_tracking_opt_out' ) );
+		add_action( 'template_redirect', array( $this, 'register_tag' ) );
 	}
 
 	/**
@@ -140,7 +140,7 @@ final class Tag_Manager extends Module
 
 		$container_id_errors = array_filter(
 			$container_ids,
-			function( $container_id ) {
+			function ( $container_id ) {
 				return ! $container_id;
 			}
 		);
@@ -295,7 +295,7 @@ final class Tag_Manager extends Module
 					$container_name = $data['name'];
 				} else {
 					// Use site name for container, fallback to domain of reference URL.
-					$container_name = get_bloginfo( 'name' ) ?: wp_parse_url( $this->context->get_reference_site_url(), PHP_URL_HOST );
+					$container_name = get_bloginfo( 'name' ) ?: URL::parse( $this->context->get_reference_site_url(), PHP_URL_HOST );
 					// Prevent naming conflict (Tag Manager does not allow more than one with same name).
 					if ( self::USAGE_CONTEXT_AMP === $usage_context ) {
 						$container_name .= ' AMP';
@@ -347,7 +347,7 @@ final class Tag_Manager extends Module
 		$restore_defer = $this->with_client_defer( false );
 
 		// Use site name for container, fallback to domain of reference URL.
-		$container_name = get_bloginfo( 'name' ) ?: wp_parse_url( $this->context->get_reference_site_url(), PHP_URL_HOST );
+		$container_name = get_bloginfo( 'name' ) ?: URL::parse( $this->context->get_reference_site_url(), PHP_URL_HOST );
 		// Prevent naming conflict (Tag Manager does not allow more than one with same name).
 		if ( self::USAGE_CONTEXT_AMP === $usage_context ) {
 			$container_name .= ' AMP';
@@ -384,12 +384,19 @@ final class Tag_Manager extends Module
 		switch ( "{$data->method}:{$data->datapoint}" ) {
 			case 'GET:accounts':
 				/* @var Google_Service_TagManager_ListAccountsResponse $response List accounts response. */
-				return $response->getAccount();
+				return Sort::case_insensitive_list_sort(
+					$response->getAccount(),
+					'name'
+				);
 			case 'GET:accounts-containers':
 				/* @var Google_Service_TagManager_ListAccountsResponse $response List accounts response. */
+				$accounts = Sort::case_insensitive_list_sort(
+					$response->getAccount(),
+					'name'
+				);
 				$response = array(
 					// TODO: Parse this response to a regular array.
-					'accounts'   => $response->getAccount(),
+					'accounts'   => $accounts,
 					'containers' => array(),
 				);
 				if ( 0 === count( $response['accounts'] ) ) {
@@ -425,7 +432,10 @@ final class Tag_Manager extends Module
 					}
 				);
 
-				return array_values( $containers );
+				return Sort::case_insensitive_list_sort(
+					array_values( $containers ),
+					'name'
+				);
 		}
 
 		return parent::parse_data_response( $data, $response );
@@ -500,19 +510,29 @@ final class Tag_Manager extends Module
 	protected function setup_assets() {
 		$base_url = $this->context->url( 'dist/assets/' );
 
+		$dependencies = array(
+			'googlesitekit-api',
+			'googlesitekit-data',
+			'googlesitekit-datastore-site',
+			'googlesitekit-modules',
+			'googlesitekit-vendor',
+			'googlesitekit-components',
+		);
+
+		$analytics_exists = apply_filters( 'googlesitekit_module_exists', false, 'analytics-4' );
+
+		// Note that the Tag Manager bundle will make use of the Analytics bundle if it's available,
+		// but can also function without it, hence the conditional include of the Analytics bundle here.
+		if ( $analytics_exists ) {
+			$dependencies[] = 'googlesitekit-modules-analytics-4';
+		}
+
 		return array(
 			new Script(
 				'googlesitekit-modules-tagmanager',
 				array(
 					'src'          => $base_url . 'js/googlesitekit-modules-tagmanager.js',
-					'dependencies' => array(
-						'googlesitekit-api',
-						'googlesitekit-data',
-						'googlesitekit-datastore-site',
-						'googlesitekit-modules',
-						'googlesitekit-modules-analytics',
-						'googlesitekit-vendor',
-					),
+					'dependencies' => $dependencies,
 				)
 			),
 		);
@@ -522,8 +542,9 @@ final class Tag_Manager extends Module
 	 * Registers the Tag Manager tag.
 	 *
 	 * @since 1.24.0
+	 * @since 1.119.0 Made method public.
 	 */
-	private function register_tag() {
+	public function register_tag() {
 		$is_amp          = $this->context->is_amp();
 		$module_settings = $this->get_settings();
 		$settings        = $module_settings->get();
@@ -544,71 +565,14 @@ final class Tag_Manager extends Module
 	}
 
 	/**
-	 * Filters whether or not the Analytics module's snippet should be controlled by its `useSnippet` setting.
+	 * Returns the Module_Tag_Matchers instance.
 	 *
-	 * @since 1.28.0
-	 * @since 1.75.0 Now requires current UA property ID as second parameter.
+	 * @since 1.119.0
 	 *
-	 * @param boolean $original_value Original value of useSnippet setting.
-	 * @param string  $ua_property_id Current UA property.
-	 * @return boolean Filtered value.
+	 * @return Module_Tag_Matchers Module_Tag_Matchers instance.
 	 */
-	private function can_analytics_use_snippet( $original_value, $ua_property_id ) {
-		$settings = $this->get_settings()->get();
-
-		if ( ! empty( $settings['gaPropertyID'] ) && $settings['useSnippet'] && $settings['gaPropertyID'] === $ua_property_id ) {
-			return false;
-		}
-
-		return $original_value;
-	}
-
-	/**
-	 * Handles Analytics measurement opt-out for the configured Analytics property in the container(s).
-	 *
-	 * @since 1.41.0
-	 *
-	 * @param string $property_id Analytics property_id.
-	 */
-	private function analytics_tracking_opt_out( $property_id ) {
-		$settings       = $this->get_settings()->get();
-		$ga_property_id = $settings['gaPropertyID'];
-		if ( ! $ga_property_id || $ga_property_id === $property_id ) {
-			return;
-		}
-
-		BC_Functions::wp_print_inline_script_tag(
-			sprintf(
-				'window["ga-disable-%s"] = true;',
-				esc_attr( $ga_property_id )
-			)
-		);
-
-	}
-
-	/**
-	 * Filters whether or not the option to exclude certain users from tracking should be displayed.
-	 *
-	 * If Site Kit does not place the Analytics snippet (neither via Analytics nor via Tag Manager),
-	 * the option to exclude certain users from tracking should not be displayed.
-	 *
-	 * @since 1.36.0
-	 *
-	 * @param boolean $allowed Whether to allow tracking exclusion.
-	 * @return boolean Filtered value.
-	 */
-	private function filter_analytics_allow_tracking_disabled( $allowed ) {
-		if ( $allowed ) {
-			return true;
-		}
-
-		$settings = $this->get_settings()->get();
-
-		if ( ! empty( $settings['gaPropertyID'] ) && $settings['useSnippet'] ) {
-			return true;
-		}
-
-		return $allowed;
+	public function get_tag_matchers() {
+		return new Tag_Matchers();
 	}
 
 	/**
@@ -629,14 +593,14 @@ final class Tag_Manager extends Module
 		try {
 			$containers = $this->get_tagmanager_service()->accounts_containers->listAccountsContainers( "accounts/{$account_id}" );
 		} catch ( Exception $e ) {
-			if ( $e->getCode() === 403 ) {
+			if ( $e->getCode() === 404 ) {
 				return false;
 			}
 			return $this->exception_to_error( $e );
 		}
 
 		$all_containers = array_map(
-			function( $container ) {
+			function ( $container ) {
 				return $container->getPublicId();
 			},
 			$containers->getContainer()
@@ -644,5 +608,4 @@ final class Tag_Manager extends Module
 
 		return empty( array_diff( $configured_containers, $all_containers ) );
 	}
-
 }

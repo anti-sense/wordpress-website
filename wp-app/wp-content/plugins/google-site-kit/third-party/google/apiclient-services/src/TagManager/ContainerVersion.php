@@ -54,6 +54,8 @@ class ContainerVersion extends \Google\Site_Kit_Dependencies\Google\Collection
     public $fingerprint;
     protected $folderType = \Google\Site_Kit_Dependencies\Google\Service\TagManager\Folder::class;
     protected $folderDataType = 'array';
+    protected $gtagConfigType = \Google\Site_Kit_Dependencies\Google\Service\TagManager\GtagConfig::class;
+    protected $gtagConfigDataType = 'array';
     /**
      * @var string
      */
@@ -68,6 +70,8 @@ class ContainerVersion extends \Google\Site_Kit_Dependencies\Google\Collection
      * @var string
      */
     public $tagManagerUrl;
+    protected $transformationType = \Google\Site_Kit_Dependencies\Google\Service\TagManager\Transformation::class;
+    protected $transformationDataType = 'array';
     protected $triggerType = \Google\Site_Kit_Dependencies\Google\Service\TagManager\Trigger::class;
     protected $triggerDataType = 'array';
     protected $variableType = \Google\Site_Kit_Dependencies\Google\Service\TagManager\Variable::class;
@@ -229,6 +233,20 @@ class ContainerVersion extends \Google\Site_Kit_Dependencies\Google\Collection
         return $this->folder;
     }
     /**
+     * @param GtagConfig[]
+     */
+    public function setGtagConfig($gtagConfig)
+    {
+        $this->gtagConfig = $gtagConfig;
+    }
+    /**
+     * @return GtagConfig[]
+     */
+    public function getGtagConfig()
+    {
+        return $this->gtagConfig;
+    }
+    /**
      * @param string
      */
     public function setName($name)
@@ -283,6 +301,20 @@ class ContainerVersion extends \Google\Site_Kit_Dependencies\Google\Collection
     public function getTagManagerUrl()
     {
         return $this->tagManagerUrl;
+    }
+    /**
+     * @param Transformation[]
+     */
+    public function setTransformation($transformation)
+    {
+        $this->transformation = $transformation;
+    }
+    /**
+     * @return Transformation[]
+     */
+    public function getTransformation()
+    {
+        return $this->transformation;
     }
     /**
      * @param Trigger[]

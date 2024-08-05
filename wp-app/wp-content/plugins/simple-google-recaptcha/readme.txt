@@ -2,9 +2,9 @@
 Contributors: Minor
 Tags: recaptcha, spam, protect, google, invisible
 Requires at least: 4.6
-Tested up to: 5.9
-Stable tag: 3.9
-Requires PHP: 7.1
+Tested up to: 6.0
+Stable tag: 4.0
+Requires PHP: 7.2
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 Donate link: https://www.paypal.me/NovaMi
@@ -40,16 +40,49 @@ If you write me (on support forum etc.), be patient, please. I work on this plug
 
 == Frequently Asked Questions ==
 = Why to install this plugin? =
-* No ads & user tracking
-* Only 1 simple script file
-* New (hidden) reCAPTCHA v3
+* No ads, user tracking, send statistics neither survey
+* Only arround 20kB size (without readme file)
+* Google reCAPTCHA v3 (invisible) support
 * Possibility to replace v3 reCAPTCHA badge by text
 * reCAPTCHA language based on WordPress settings
 * Works in countries where Google domain is blocked
-* Emergency reCAPTCHA deactivate link
+* Emergency reCAPTCHA deactivate link for admin
+* Hooks - Possibility to customize where reCAPTCHA will be rendered and verified
+
+= In case you have a problem =
+1. Important message could be shown in browser console (F12) on problematic page
+2. Double check if you have correct keys in settings - is those keys for correct version reCAPTCHA?
+3. Try to create new website in Google reCAPTCHA console (and use different website name)
 
 = How to disable this plugin? =
 Use standard WordPress Plugins page. In emergency case, rename plugin folder under /wp-content/plugins/ over FTP access or use emergency reCAPTCHA deactivate link.
+
+= How to use hooks? =
+For example, you can use this in your global functions.php file:
+
+<pre><code>
+function customSgrRenderList(array $list): array //Where reCAPTCHA is rendered
+{
+    //unset($list[0]);
+    $list[] = 'register_form';
+
+    return $list;
+}
+
+add_action('sgr_render_list', 'customSgrRenderList');
+
+function customSgrVerifyList(array $list): array //Where reCAPTCHA is verified
+{
+    //unset($list[0]);
+    $list[] = 'lostpassword_post';
+
+    return $list;
+}
+
+add_action('sgr_verify_list', 'customSgrVerifyList');
+</code></pre>
+
+Variable $list is array of default hooks, indexed by numbers.
 
 == Screenshots ==
 1. New comment
@@ -61,6 +94,10 @@ Use standard WordPress Plugins page. In emergency case, rename plugin folder und
 7. Emergency reCAPTCHA deactivate link
 
 == Changelog ==
+= 4.0 =
+* Warning: I don't recommend Google reCAPTCHA v2. You should enable v3 in plugin settings (requires different keys)!
+* New: Hooks - sgr_render_list + sgr_verify_list. You are able to customize where Google reCAPTCHA will be rendered and verified - e.g. via functions.php.
+
 = 3.9 =
 * Bugfix: reCAPTCHA verification has been rewritten. More reliable and prevents brute force attacks now.
 
