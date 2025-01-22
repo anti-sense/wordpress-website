@@ -26,3 +26,5 @@ sudo chown ${USERNAME}:${USERNAME} /home/${USERNAME}/build.sh
 
 echo 'now run: cd;./build.sh'
 sudo su ${USERNAME}
+sudo apt -y install certbot
+sudo certbot certonly --standalone --agree-tos -m brunovasquescosta@gmail.com -d anti-sense.com
