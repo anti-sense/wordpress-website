@@ -40,8 +40,8 @@ sudo mysql -e "GRANT ALL PRIVILEGES ON ${WORDPRESS_DB_NAME}.* TO '${WORDPRESS_DB
 
 #SET Credentials for wp-app in docker
 sed -i "s/'DB_NAME', '.*'/'DB_NAME', '${WORDPRESS_DB_NAME}'/" wordpress-website/wp-app/wp-config.php
-sed -i "s/'DB_USER', '.*'/'DB_NAME', '${WORDPRESS_DB_USER}'/" wordpress-website/wp-app/wp-config.php
-sed -i "s/'DB_PASSWORD', '.*'/'DB_NAME', '${WORDPRESS_DB_PASSWORD}'/" wordpress-website/wp-app/wp-config.php
+sed -i "s/'DB_USER', '.*'/'DB_USER', '${WORDPRESS_DB_USER}'/" wordpress-website/wp-app/wp-config.php
+sed -i "s/'DB_PASSWORD', '.*'/'DB_PASSWORD', '${WORDPRESS_DB_PASSWORD}'/" wordpress-website/wp-app/wp-config.php
 
 
 echo '#################################################'
