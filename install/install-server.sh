@@ -17,7 +17,8 @@ docker build -t antisense/website .
 
 sudo mysql -D ${WORDPRESS_DB_NAME} < /home/$USER/latest.sql
 mkdir /home/$USER/wordpress-website/wp-data/
-mv /home/$USER/latest.sql /home/$USER/wordpress-website/wp-data/
+## Can't have it inside
+# mv /home/$USER/latest.sql /home/$USER/wordpress-website/wp-data/
 
 
 sudo apt install nginx certbot python3-certbot-nginx
