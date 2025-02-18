@@ -13,6 +13,7 @@ rsync -Pvzb /home/${USER}/wordpress-website/wp-data/latest.sql.gz backup:~/data/
 ##run dated backup copy & compress 
 
 cd /home/brunocosta/wordpress-website
+git checkout -- wp-app/wp-config.php
 git add .
 git commit -m "Weekly backup"
 git tag backup$_now
