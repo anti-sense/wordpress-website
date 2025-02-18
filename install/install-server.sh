@@ -2,10 +2,8 @@
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 . $DIR/../.env
 
-
-## ADD envs to docker
-## Change VARS in SQL
-
+#Unzip database
+gunzip latest.sql
 
 #Build website
 cd wordpress-website
