@@ -24,5 +24,6 @@ sudo chmod +x build.sh
 sudo cp /home/ubuntu/build.sh /home/${USERNAME}/build.sh
 sudo chown ${USERNAME}:${USERNAME} /home/${USERNAME}/build.sh
 
+echo -e '\n\n\n\n'
 echo 'now run: cd;./build.sh'
 sudo su ${USERNAME}
