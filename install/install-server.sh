@@ -34,9 +34,9 @@ sudo systemctl start nginx
 docker run -d --network="host" --env-file $DIR/../.env  --mount type=bind,source=/home/$USER/wordpress-website/wp-app,target=/var/www/html --restart unless-stopped antisense/website
 sudo ln -s /var/lib/docker/volumes/wp-app/_data /home/$USER/wordpress-website/backup
 sudo chown -R www-data:www-data /home/$USER/wordpress-website/wp-app/
-sudo chown -R www-data:www-data /wordpress-website/wp-app/wp-includes
-sudo chown -R www-data:www-data /wordpress-website/wp-app/wp-admin
-sudo chown -R www-data:www-data /wordpress-website/wp-app/wp-content
+sudo chown -R www-data:www-data /home/$USER//wordpress-website/wp-app/wp-includes
+sudo chown -R www-data:www-data /home/$USER//wordpress-website/wp-app/wp-admin
+sudo chown -R www-data:www-data /home/$USER//wordpress-website/wp-app/wp-content
 sudo chown -R www-data:www-data /home/$USER/wordpress-website/backup/.htaccess
 
 ##Setup madreputa
