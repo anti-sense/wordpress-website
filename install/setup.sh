@@ -1,19 +1,20 @@
 #!/usr/bin/env bash
+DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+
 echo -n Database name?: 
 read DB_NAME
-echo "DB_NAME=${DB_NAME}" > ../.env
+echo "DB_NAME=${DB_NAME}" > $DIR/../.env
 
 echo -n Database user?: 
 read DB_USER
-echo "DB_USER=${DB_USER}" >> ../.env
+echo "DB_USER=${DB_USER}" >> $DIR/../.env
 
 echo -n Database password?: 
 read DB_PASSWORD
-echo "DB_PASSWORD=${DB_PASSWORD}" >> ../.env
+echo "DB_PASSWORD=${DB_PASSWORD}" >> $DIR/../.env
 
 
-../.env
-DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+
 . $DIR/../.env
 
 
