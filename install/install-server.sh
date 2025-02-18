@@ -22,10 +22,9 @@ mkdir /home/$USER/wordpress-website/wp-data/
 sudo apt install nginx certbot python3-certbot-nginx
 sudo systemctl start nginx
 sudo cp nginx/antisense.conf /etc/nginx/sites-available/
-sudo certbot certonly --standalone --agree-tos -m brunovasquescosta@gmail.com -d anti-sense.com
-
 
 sudo systemctl stop nginx
+sudo certbot certonly --standalone --agree-tos -m brunovasquescosta@gmail.com -d anti-sense.com
 sudo unlink /etc/nginx/sites-enabled/default
 sudo ln -s /etc/nginx/sites-available/antisense.conf /etc/nginx/sites-enabled/antisense.conf
 sudo systemctl start nginx
