@@ -23,7 +23,9 @@ mv /home/$USER/latest.sql /home/$USER/wordpress-website/wp-data/
 sudo apt install nginx certbot python3-certbot-nginx
 sudo systemctl start nginx
 sudo cp nginx/antisense.conf /etc/nginx/sites-available/
-sudo certbot --nginx certonly -d anti-sense.com -d www.anti-sense.com
+sudo certbot certonly --standalone --agree-tos -m brunovasquescosta@gmail.com -d anti-sense.com
+
+
 sudo systemctl stop nginx
 sudo unlink /etc/nginx/sites-enabled/default
 sudo ln -s /etc/nginx/sites-available/antisense.conf /etc/nginx/sites-enabled/antisense.conf
