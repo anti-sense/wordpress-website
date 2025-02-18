@@ -3,6 +3,10 @@ DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 . $DIR/../.env
 
 
+## ADD envs to docker
+## Change VARS in SQL
+
+
 #Build website
 cd wordpress-website
 
@@ -25,7 +29,7 @@ sudo unlink /etc/nginx/sites-enabled/default
 sudo ln -s /etc/nginx/sites-available/antisense.conf /etc/nginx/sites-enabled/antisense.conf
 sudo systemctl start nginx
 ##Mounts the github folder "wp-add" instead of the Dockerfile content
-docker run -d --network="host" --mount type=bind,source=/home/$USER/wordpress-website/wp-app,target=/var/www/html --restart unless-stopped antisense/website
+docker run -d --network="host" --env-file $DIR/../.env  --mount type=bind,source=/home/$USER/wordpress-website/wp-app,target=/var/www/html --restart unless-stopped antisense/website
 sudo ln -s /var/lib/docker/volumes/wp-app/_data /home/$USER/wordpress-website/backup
 sudo chown -R www-data:www-data /home/$USER/wordpress-website/wp-app/
 sudo chown -R www-data:www-data /var/lib/docker/volumes/wp-app/_data/wp-includes
