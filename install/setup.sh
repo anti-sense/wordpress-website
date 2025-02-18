@@ -3,18 +3,17 @@ DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 
 echo -n Database name?: 
 read DB_NAME
-echo "DB_NAME=${DB_NAME}" > $DIR/../.env
+echo "WORDPRESS_DB_NAME=${DB_NAME}" > $DIR/../.env
 
 echo -n Database user?: 
 read DB_USER
-echo "DB_USER=${DB_USER}" >> $DIR/../.env
+echo "WORDPRESS_DB_USER=${DB_USER}" >> $DIR/../.env
 
 echo -n Database password?: 
 read DB_PASSWORD
-echo "DB_PASSWORD=${DB_PASSWORD}" >> $DIR/../.env
+echo "WORDPRESS_DB_PASSWORD=${DB_PASSWORD}" >> $DIR/../.env
 
-
-
+#LOAD SAVED ENV
 . $DIR/../.env
 
 
@@ -35,9 +34,9 @@ sudo apt install mysql-server
 sudo mysql_secure_installation
 
 #SET GLOBAL validate_password_policy=low
-sudo mysql -e "CREATE DATABASE ${DB_NAME};"
-sudo mysql -e "Create USER '${DB_USER}'@'localhost' IDENTIFIED WITH mysql_native_password BY '${DB_PASSWORD}';" 
-sudo mysql -e "GRANT ALL PRIVILEGES ON ${DB_NAME}.* TO '${DB_USER}'@'localhost';FLUSH PRIVILEGES;" 
+sudo mysql -e "CREATE DATABASE ${WORDPRESS_DB_NAME};"
+sudo mysql -e "Create USER '${WORDPRESS_DB_USER}'@'localhost' IDENTIFIED WITH mysql_native_password BY '${WORDPRESS_DB_PASSWORD}';" 
+sudo mysql -e "GRANT ALL PRIVILEGES ON ${WORDPRESS_DB_NAME}.* TO '${WORDPRESS_DB_USER}'@'localhost';FLUSH PRIVILEGES;" 
 
 echo '#################################################'
 echo '#  Build-Essential, Docker and MySQL installed  #'
