@@ -38,6 +38,12 @@ sudo mysql -e "CREATE DATABASE ${WORDPRESS_DB_NAME};"
 sudo mysql -e "Create USER '${WORDPRESS_DB_USER}'@'localhost' IDENTIFIED WITH mysql_native_password BY '${WORDPRESS_DB_PASSWORD}';" 
 sudo mysql -e "GRANT ALL PRIVILEGES ON ${WORDPRESS_DB_NAME}.* TO '${WORDPRESS_DB_USER}'@'localhost';FLUSH PRIVILEGES;" 
 
+#SET Credentials for wp-app in docker
+sed -i "s/'DB_NAME', '.*'/'DB_NAME', '${WORDPRESS_DB_NAME}'/" wordpress-website/wp-app/wp-config.php
+sed -i "s/'DB_USER', '.*'/'DB_NAME', '${WORDPRESS_DB_USER}'/" wordpress-website/wp-app/wp-config.php
+sed -i "s/'DB_PASSWORD', '.*'/'DB_NAME', '${WORDPRESS_DB_PASSWORD}'/" wordpress-website/wp-app/wp-config.php
+
+
 echo '#################################################'
 echo '#  Build-Essential, Docker and MySQL installed  #'
 echo '#################################################'
